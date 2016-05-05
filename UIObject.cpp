@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////
 //                                               //
-//   File:               UIObject.h              //
+//   File:               UIObject.cpp            //
 //   Class:              class UIObject          //
 //   < Class function definition >               //
 //   Description:        Base class of all UI    //

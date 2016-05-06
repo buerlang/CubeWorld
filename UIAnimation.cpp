@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //                                                                    //
-//   File:               UIAnimation.h                                //
+//   File:               UIAnimation.cpp                              //
 //   Class:              class UIAnimation       : base	              //
 //                       class UITransAnimation  : preset: Translate  //
 //                       class UIWaitAnimation   : preset: Waiting    //
@@ -36,6 +36,7 @@ void UIAnimation::start()
 {
 	object->addAnimation(this);
 	object->setReceivePick(false);
+	mergeToOri();
 }
 
 void UIAnimation::startAfter(float time)
@@ -47,6 +48,8 @@ void UIAnimation::startAfter(float time)
 
 void UIAnimation::end()
 {
+	if(onStop)
+		onStop();
 	if (attach != nullptr)
 	{
 		attach->start();
@@ -93,6 +96,12 @@ bool UIAnimation::getIsOver()
 void UIAnimation::setAttachedAnimation(UIAnimation* anim)
 {
 	this->attach = anim;
+}
+
+//-- Set its onStop function
+void UIAnimation::setOnStop(void(*onStop)())
+{
+	this->onStop = onStop;
 }
 
 

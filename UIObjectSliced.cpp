@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////
 //                                               //
-//   File:               UIObjectSliced.h        //
+//   File:               UIObjectSliced.cpp      //
 //   Class:              class UIObjectSliced    //
 //   Inherit from:       class UIObject          //
 //   < Class Function Definitions >              //

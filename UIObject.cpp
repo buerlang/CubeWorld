@@ -49,6 +49,7 @@ UIObject::UIObject(char* name, char* imagePath, GLuint width, GLuint height, UIA
 //-- Called in every frame.
 void UIObject::update()
 {
+	//std::cout << name << " updated!" << std::endl;
 	std::set<UIAnimation*>::iterator it;
 	for (it = animations.begin(); it != animations.end(); )
 	{
@@ -85,6 +86,7 @@ void UIObject::setActive(bool localActive)
 {
 	this->localActive = localActive;
 }
+
 //-- Alignment setting.
 void UIObject::setAlignment(UIAlignmentEnum align, GLint offsetX, GLint offsetY)
 {	
@@ -95,7 +97,7 @@ void UIObject::setAlignment(UIAlignmentEnum align, GLint offsetX, GLint offsetY)
 //-- Position setting.
 void UIObject::setLocalPosition(GLuint x, GLuint y)
 {
-	align = UI_BOTTOM_LEFT;
+	//align = UI_BOTTOM_LEFT;
 	localOffsetX = x;
 	localOffsetY = y;
 }
@@ -163,8 +165,8 @@ void UIObject::draw()
 //-- Called by the UIManager class.
 void UIObject::pickTest(GLuint mouseX, GLuint mouseY, UIObject** entered)
 {	
-	//std::cout << name << " Do Pick Test: " << receivePick << std::endl;
-	if (receivePick)
+	std::cout << name << " Do Pick Test: " << receivePick << std::endl;
+	if (pickable && receivePick)
 	{
 		/*std::cout << "left: " << getLeft() << std::endl;
 		std::cout << "right: " << getRight() << std::endl;
@@ -179,7 +181,7 @@ void UIObject::pickTest(GLuint mouseX, GLuint mouseY, UIObject** entered)
 			return;
 		}
 	}
-	*entered = nullptr;
+	//*entered = nullptr;
 }
 
 //-- Add a new UI animation to the animation set.

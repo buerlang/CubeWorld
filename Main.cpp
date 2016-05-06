@@ -19,7 +19,7 @@ void window_size_callback(GLFWwindow* window, int width, int height);
 void setupUI();
 void moveAway();
 
-const GLuint WIDTH = 1080, HEIGHT = 720;
+const int WIDTH = 1080, HEIGHT = 720;
 
 GLuint mouseX, mouseY;
 
@@ -27,6 +27,7 @@ GLuint UIProgram;
 UIManager *UI;
 UIButton *UI1, *UI2, *UI3;
 UIObjectSliced *Image;
+UIButton *Back;
 
 
 // The MAIN function, from here we start the application and run the game loop
@@ -42,7 +43,7 @@ int main()
 	// window borders and title
 	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "UI Test", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	
 	glfwSetKeyCallback(window, key_callback);
@@ -117,10 +118,25 @@ void setupUI()
 	Image = new UIObjectSliced("Image", "sliceimage.png", 100, 100, UI_CENTER, 0, 0, UIProgram);
 	Image->setSlice(0.25f, 0.75f, 0.25f, 0.75f);
 	UI->add(Image);
+	Back = new UIButton("Back", "button_start_default.png", 200, 40, UI_BOTTOM, 0, 40, UIProgram, 
+		[]() {		
+			UITransAnimation* anim = new UITransAnimation(Image, 0, 0, 0, HEIGHT, 0.4f, false, STOP_AT_DESTINATION);
+			anim->start();
+			anim->setOnStop([]() { Image->setActive(false); });
+		});
+	UI->add(Back);
+	Back->setParent(Image);
+	Image->setSize(Back->width + 20, Back->height + 200);
+	Image->setActive(false);
 
 	// The width of source image MUST! BE! MULTIPLE! OF! 4! !!!!!
 	UI1 = new UIButton("UI 1", "button_start_default.png", 200, 40, UI_LEFT, 20, 20, UIProgram, []() {Image->setSize(200, 200); });
-	UI2 = new UIButton("UI 2", "button_start_default.png", 200, 40, UI_LEFT, 20, -40, UIProgram, []() { UI1->setActive(!UI1->localActive); });
+	UI2 = new UIButton("UI 2", "button_start_default.png", 200, 40, UI_LEFT, 20, -40, UIProgram, 
+		[]() { 
+			Image->setActive(true);
+			UITransAnimation* anim = new UITransAnimation(Image, 0, -HEIGHT / 2 - Image->height, 0, 0, 0.4f, false, STOP_AT_DESTINATION);
+			anim->start();
+		});
 	UI3 = new UIButton("UI 3", "button_start_default.png", 200, 40, UI_LEFT, 20, -100, UIProgram, moveAway);
 	UI->add(UI1);
 	UI->add(UI2);

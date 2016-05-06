@@ -48,6 +48,9 @@ protected:
 	//-- If not nullptr, attached animation should have effect when this animation ends.
 	UIAnimation* attach = nullptr;
 
+	//-- Callback function upon this animation ends
+	void (*onStop)();
+
 	//================================================= protected virtual functions ====================================================//
 	
 	//-- How to interpolates its value from current to destination.
@@ -84,6 +87,8 @@ public:
 	void setAttachedAnimation(UIAnimation* anim);
 	//-- Start this animation after some delay. (time in seconds)
 	void startAfter(float time);
+	//-- Set its onStop function
+	void setOnStop(void(*onStop)());
 };
 
 //-- Class UITransAniamtion

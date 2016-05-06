@@ -14,5 +14,7 @@ void main()
 {
 	float uvAff = clamp(-11 * (TexCoord.y - 0.2f) * (TexCoord.y - 0.8f), 0, 1);
 	vec4 tex = texture(_Image, TexCoord);
-	color = vec4(tex.xyz, tex.w * _Opaque) + vec4(_Emission, 0.0f) + vec4(uvAff, uvAff, uvAff, 0.0f) * _UVFactor;
+	color = vec4(tex.xyz, tex.w * _Opaque) + 
+	        vec4(_Emission, 0.0f) + 
+			vec4(uvAff, uvAff, uvAff, 0.0f) * _UVFactor;
 }

@@ -52,6 +52,8 @@ public:
 	float alpha = 1;
 	//-- Parent UI object.
 	UIObject* parent = nullptr;
+	//-- Can this UI object picked by mouse.
+	bool pickable = false;
 
 	//=========================================== Constructors and Destructors ===========================================//
 	
@@ -146,7 +148,7 @@ protected:
 	//-- Each animation would be updated in the Update() function.
 	std::set<UIAnimation*> animations;
 	//-- Whether to receive mouse picking.
-	bool receivePick = false;
+	bool receivePick = true;
 	//-- Set of children UI objects.
 	std::set<UIObject*> children;
 

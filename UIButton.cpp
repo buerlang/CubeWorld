@@ -17,21 +17,21 @@
 UIButton::UIButton(char* name, char* image, GLuint width, GLuint height, GLuint program, ButtonOnClickFun func)
 		:UIObject(name, image, width, height, program)
 {
-	setReceivePick(true);
+	pickable = true;
 	this->onClick = func;
 }
 //-- Constructor
 UIButton::UIButton(char* name, char* image, GLuint width, GLuint height, GLint xPos, GLint yPos, GLuint program, ButtonOnClickFun func)
 	: UIObject(name, image, width, height, xPos, yPos, program)
 {
-	setReceivePick(true);
+	pickable = true;
 	this->onClick = func;
 }
 //-- Constructor
 UIButton::UIButton(char* name, char* image, GLuint width, GLuint height, UIAlignmentEnum align, GLint offsetX, GLint offsetY, GLuint program, ButtonOnClickFun func)
 	: UIObject(name, image, width, height, align, offsetX, offsetY, program)
 {
-	setReceivePick(true);
+	pickable = true;
 	this->onClick = func;
 }
 
@@ -113,7 +113,8 @@ void UIButton::onClicked()
 	if (!receivePick)
 		return;
 	//std::cout << name + ":Clicked!" << std::endl;
-	onClick();
+	if(onClick)
+		onClick();
 }
 //-- Mouse Callback Function.
 void UIButton::onLeaved()

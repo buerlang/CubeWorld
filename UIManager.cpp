@@ -34,17 +34,26 @@ void UIManager::add(UIObject* object)
 //-- Return True if any UI element is picked, and GameManager needn't do other picking tests.
 bool UIManager::checkForMouseEvent(unsigned int mouseX, unsigned int mouseY)
 {
+	bool ret = false;
+
 	// Keep the UI Object picked last frame
 	lastUIEntered = curUIEntered;
 	lastMouseState = curMouseState;
 
 	// Do Pick Test for each UI Object
+	curUIEntered = nullptr;
 	std::list<UIObject*>::iterator it;
 	for (it = objects.begin(); it != objects.end(); it++)
 	{
-		(*it)->pickTest(mouseX, mouseY, &curUIEntered);
-		if (curUIEntered != nullptr)
-			break;
+		if ((*it)->getActiveInParents())
+		{
+			(*it)->pickTest(mouseX, mouseY, &curUIEntered);
+			if (curUIEntered != nullptr)
+			{
+				ret = true;
+				//break;
+			}
+		}			
 	}
 	
 	curMouseState = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT);
@@ -86,7 +95,7 @@ bool UIManager::checkForMouseEvent(unsigned int mouseX, unsigned int mouseY)
 			}
 		}
 	}
-	return false;
+	return ret;
 }
 
 //-- Draw all the UI elements.

@@ -10,6 +10,10 @@
 #include "UIButton.h"
 #include "UIObjectSliced.h"
 
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glfw3.lib")
+#pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "soil.lib")
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void cursor_pos_callback(GLFWwindow* window, double x, double y);

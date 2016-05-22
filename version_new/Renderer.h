@@ -4,6 +4,7 @@
 #include "IncludeStd.h"
 #include "Component.h"
 #include "RenderManager.h"
+#include "Shader.h"
 
 class Material;
 class Mesh;
@@ -24,6 +25,8 @@ public:
 
 	void setMaterial(Material* material)
 	{
+		if(material)
+			RenderManager::getInstance()->unRegisterObject(object);
 		this->defaultMaterial = this->material = material;
 		RenderManager::getInstance()->registerObject(object);
 	}
@@ -44,22 +47,51 @@ public:
 		}
 	}
 
-	void setFloat(char* name, float value)
+	void cloneMaterial()
 	{
 		RenderManager::getInstance()->unRegisterObject(object);
-		material = new Material();
-		material->shader = defaultMaterial->shader;
-		material->texture = defaultMaterial->texture;
-		for (UniformMap::iterator it = defaultMaterial->uniformMap.begin(); it != defaultMaterial->uniformMap.end(); it++)
+		if (material != defaultMaterial)
 		{
-			material->uniformMap.insert(UniformMapItem(it->first, it->second));
+			delete material;
 		}
-		material->onBegin = defaultMaterial->onBegin;
-		material->onEnd = defaultMaterial->onEnd;
-		material->setExtraBegin([=]() {
-			glUniform1f(material->getUniform(name), value);
-		});
+		material = new Material();
+		material->setShader(defaultMaterial->shader)
+			->setBegin(defaultMaterial->onBegin)
+			->setDraw(defaultMaterial->onDraw)
+			->setEnd(defaultMaterial->onEnd)
+			->setHasAlpha(defaultMaterial->hasAlpha)
+			->setTexture(defaultMaterial->texture);
+
 		RenderManager::getInstance()->registerObject(object);
+	}
+
+	void setValue(char* name, float value)
+	{
+		cloneMaterial();
+		material->setExtraBegin([=]() {
+			glUniform1f(material->shader->getUniform(name), value);
+		});
+	}
+	void setValue(char* name, int value)
+	{
+		cloneMaterial();
+		material->setExtraBegin([=]() {
+			glUniform1i(material->shader->getUniform(name), value);
+		});
+	}
+	void setValue(char* name, vec2 value)
+	{
+		cloneMaterial();
+		material->setExtraBegin([=]() {
+			glUniform2f(material->shader->getUniform(name), value.x, value.y);
+		});
+	}
+	void setValue(char* name, vec3 value)
+	{
+		cloneMaterial();
+		material->setExtraBegin([=]() {
+			glUniform3f(material->shader->getUniform(name), value.x, value.y, value.z);
+		});
 	}
 };
 

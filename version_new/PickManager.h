@@ -3,7 +3,11 @@
 
 #include "IncludeStd.h"
 
-#define MAX_DISTANCE 10000
+struct Ray
+{
+	vec3 origin;
+	vec3 direction;
+};
 
 class Object;
 class PickManager
@@ -14,7 +18,8 @@ public:
 
 	Object* lastPick = nullptr;
 	Object* curPick = nullptr;
-	float distance = MAX_DISTANCE;
+	float distance = INFINITY;
+	vec3 pickPoint;
 
 	list<Object*> objectList;
 	list<Object*> UIObjectList;
@@ -28,9 +33,9 @@ public:
 		mat4& ProjectionMatrix,
 		Ray* ray_out
 		);
-	void pickTest(Object* object, Ray* ray, Object** out, float* distance);
+	void pickTest(Object* object, Ray* ray, Object** out, float* distance, vec3* pickPoint);
 	void pickTestForUI(Object* object, int mouseX, int mouseY, Object** out);
-	bool TestRayOBBIntersection(Ray* ray, Object* object, float* distance_out);
+	bool TestRayOBBIntersection(Ray* ray, Object* object, float* distance_out, vec3* pickPoint);
 protected:
 	PickManager();
 	static PickManager* instance;

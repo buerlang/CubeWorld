@@ -22,7 +22,7 @@ InputManager* InputManager::getInstance()
 	return instance;
 }
 
-bool InputManager::getMouseButtonPressed(int buttonNum)
+bool InputManager::getMouseButton(int buttonNum)
 {
 	return buttons[buttonNum].curState == MOUSE_PRESSED;
 }

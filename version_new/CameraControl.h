@@ -15,3 +15,5 @@ public:
 
 
 #endif // !CAMERA_CONTROL_H
+
+

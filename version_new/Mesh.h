@@ -66,8 +66,15 @@ public:
 
 	int getIndexCount();
 	int getVertexCount();
-	virtual void genBuffer();
-	virtual void genBuffer(float* verteces, int vertecesLength, unsigned int* indeces, int indecesLength);
+	Mesh* genBuffer();
+	Mesh* genBuffer(float* vertices, int verticesLength, unsigned int* indices, int indicesLength);
+	void updateBuffer();
+	Mesh* addVertex(Vertex vertex);
+	Mesh* addIndex(Index index);
+
+	Mesh* loadModel(string path, float size);
+	void processNode(aiNode* node, const aiScene* scene, float size);
+	void processMesh(aiMesh* mesh, float size);
 };
 
 

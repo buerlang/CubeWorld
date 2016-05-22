@@ -3,14 +3,11 @@
 
 #include "IncludeStd.h"
 
-//#include "Shader.h"
-
 #include "Component.h"
 #include "ComponentFactory.h"
 #include "Material.h"
 #include "Object.h"
 #include "ObjectManager.h"
-#include "Pickable.h"
 #include "Renderer.h"
 #include "RenderManager.h"
 #include "TestComponent.h"
@@ -19,19 +16,23 @@
 #include "UIAnimation.h"
 #include "UIButton.h"
 #include "UIImage.h"
-#include "UIManager.h"
-#include "UIObject.h"
-#include "UIObjectSliced.h"
 #include "UITransform.h"
-#include "UIRenderer.h"
 #include "Screen.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "InputManager.h"
 #include "PickManager.h"
-#include "PickableUI.h"
 #include "BoxCollider.h"
 #include "CameraControl.h"
+#include "UIAnimator.h"
+#include "UIAnimation.h"
+#include "MeshList.h"
+#include "MaterialList.h"
+#include "ObjectsList.h"
+#include "GridHolder.h"
+#include "Shader.h"
+#include "ShaderList.h"
+#include "DirectionLight.h"
 
 #endif // !INCLUDE_CLASS_H
 

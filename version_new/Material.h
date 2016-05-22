@@ -4,6 +4,7 @@
 #include "IncludeStd.h"
 
 class Object;
+class Shader;
 
 typedef pair<string, unsigned int> UniformMapItem;
 typedef map<string, unsigned int> UniformMap;
@@ -14,26 +15,31 @@ public:
 	Material();
 	~Material();
 
-	GLuint shader;
+	static Material* create();
+
+	Shader* shader;
 	//std::vector<GLuint> texture;
 	GLuint texture;
-	UniformMap uniformMap;
+	bool hasAlpha = false;
 
-	void(*onBegin)();
-	void(*onEnd)();
+	function<void()> onBegin;
+	function<void(Object*)> onDraw;
+	function<void()> onEnd;
 	function<void()> onExtraBegin;
 
-	void setBegin(void(*onBegin)());
-	void setExtraBegin(function<void()> onExtraBegin);
-	void setEnd(void(*onEnd)());
-	void setTexture(char* image);
-	void setShader(GLuint shaderID);
+	Material* setBegin(function<void()> onBegin);
+	Material* setExtraBegin(function<void()> onExtraBegin);
+	Material* setEnd(function<void()> onEnd);
+	Material* setDraw(function<void(Object*)> onDraw);
+	Material* setTexture(char* image);
+	Material* setTexture(GLuint texture);
+	Material* setShader(Shader* shader);
+	Material* setHasAlpha(bool hasAlpha);
 	void begin();
 	void extraBegin();
+	void draw(Object* object);
 	void render(Object* object);
 	void end();
-	unsigned int getUniform(char* name);
-	void registerUniform(char* name);
 };
 
 

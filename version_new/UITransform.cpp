@@ -7,6 +7,7 @@ void UITransform::start()
 	offset = vec2(0, 0);
 	size = vec2(0, 0);
 	scale = vec2(1, 1);
+	object->pickable = true;
 	PickManager::getInstance()->registerObject(object, true);
 }
 void UITransform::update()
@@ -20,49 +21,55 @@ void UITransform::onDestroy()
 
 void UITransform::onMouseEnter()
 {
-	if(object->getComponent(Renderer))
-		object->getComponent(Renderer)->setFloat("_UVFactor", 0.5);
 }
 void UITransform::onMouseOver()
 {
-	
 }
 void UITransform::onMouseLeave()
 {
-	if (object->getComponent(Renderer))
-		object->getComponent(Renderer)->resumeMaterial();
 }
 
 //-- Alignment setting.
-void UITransform::setAlignment(UIAlignmentEnum align, int offsetX, int offsetY)
+UITransform* UITransform::setAlignment(UIAlignmentEnum align, int offsetX, int offsetY)
 {
 	this->align = align;
 	this->offset = vec2(offsetX, offsetY);
+	return this;
 }
 //-- Position setting.
-void UITransform::setLocalPosition(int x, int y)
+UITransform* UITransform::setOffset(int x, int y)
 {
-	this->localPosition = vec3(x, y, localPosition.z);
+	this->offset = vec2(x, y);
+	return this;
 }
 //-- Scale setting.
-void UITransform::setScale(float x, float y)
+UITransform* UITransform::setScale(float x, float y)
 {
 	this->scale = vec2(x, y);
+	return this;
 }
 //-- Size setting.
-void UITransform::setSize(float width, float height)
+UITransform* UITransform::setSize(float width, float height)
 {
-	this->size = vec2(width, height);
+	this->size = vec2(width, height); 
+	
+	this->object->getComponent(Renderer)->mesh->vertices[0].position.y = height;
+	this->object->getComponent(Renderer)->mesh->vertices[2].position.x = width;
+	this->object->getComponent(Renderer)->mesh->vertices[2].position.y = height;
+	this->object->getComponent(Renderer)->mesh->vertices[3].position.x = width;
+	this->object->getComponent(Renderer)->mesh->updateBuffer();
+	return this;
 }
 
+
 //-- Return position in local screen space.
-vec2 UITransform::getLocalPosition()
+vec3 UITransform::getLocalPosition()
 {
 	vec2 localPosition = vec2(0, 0);
 	vec2 parentSize = vec2(0, 0);
 	if (object->parent == nullptr)
 	{
-		glfwGetWindowSize(glfwGetCurrentContext(), (int*)&(parentSize.x), (int*)&(parentSize.y));
+		parentSize = vec2(Screen::Width, Screen::Height);
 	}
 	else
 	{
@@ -108,21 +115,22 @@ vec2 UITransform::getLocalPosition()
 	default:
 		break;
 	}
-	return localPosition;
+	return vec3(localPosition, 0);
 }
 
-//-- Return position in global screen space.
-vec2 UITransform::getGlobalPosition()
-{
-	if (object->parent == nullptr)
-	{
-		return getLocalPosition();
-	}
-	else
-	{
-		return getLocalPosition() + object->parent->getComponent(UITransform)->getGlobalPosition();
-	}
-}
+
+////-- Return position in global screen space.
+//vec2 UITransform::getGlobalPosition()
+//{
+//	if (object->parent == nullptr)
+//	{
+//		return getLocalPosition();
+//	}
+//	else
+//	{
+//		return getLocalPosition() + object->parent->getComponent(UITransform)->getGlobalPosition();
+//	}
+//}
 //-- Return the left boundary in global screen space.
 float UITransform::getLeft()
 {

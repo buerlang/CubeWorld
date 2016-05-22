@@ -1,11 +1,13 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
-#define MOUSE_PRESSED 0
-#define MOUSE_RELEASED 1
-#define MOUSE_LEFT 0
-#define MOUSE_RIGHT 1
-#define MOUSE_MIDDLE 2
+#include "IncludeStd.h"
+
+#define MOUSE_PRESSED GLFW_PRESS
+#define MOUSE_RELEASED GLFW_RELEASE
+#define MOUSE_LEFT GLFW_MOUSE_BUTTON_LEFT
+#define MOUSE_RIGHT GLFW_MOUSE_BUTTON_RIGHT
+#define MOUSE_MIDDLE GLFW_MOUSE_BUTTON_MIDDLE
 
 
 struct MouseButton
@@ -23,7 +25,7 @@ public:
 	int mouseX, mouseY;
 
 	
-	bool getMouseButtonPressed(int buttonNum);
+	bool getMouseButton(int buttonNum);
 	bool getMouseButtonDown(int buttonNum);
 	bool getMouseButtonUp(int buttonNum);
 

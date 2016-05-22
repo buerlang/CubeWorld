@@ -41,7 +41,8 @@ void PickManager::update()
 {
 	lastPick = curPick;
 	curPick = nullptr;
-	distance = MAX_DISTANCE;
+	distance = INFINITY;
+	pickPoint = vec3(INFINITY, INFINITY, INFINITY);
 
 	bool uiPicked = false;
 	//cout << UIObjectList.empty() << endl;
@@ -49,10 +50,13 @@ void PickManager::update()
 	{
 		for each (Object* obj in UIObjectList)
 		{
-			pickTestForUI(obj, InputManager::getInstance()->mouseX, InputManager::getInstance()->mouseY, &curPick);
-			if (curPick)
+			if (obj->getActiveInParents())
 			{
-				uiPicked = true;
+				pickTestForUI(obj, InputManager::getInstance()->mouseX, InputManager::getInstance()->mouseY, &curPick);
+				if (curPick)
+				{
+					uiPicked = true;
+				}
 			}
 		}
 	}
@@ -69,11 +73,13 @@ void PickManager::update()
 			);
 		for each (Object* obj in objectList)
 		{
-			pickTest(obj, &ray, &curPick, &distance);
+			if(obj->getActiveInParents())
+				pickTest(obj, &ray, &curPick, &distance, &pickPoint);
 		}
 	}
-	//if(curPick)
+	//if (curPick)
 		//cout << curPick->name << endl;
+		//cout << pickPoint.x << "," << pickPoint.y << "," << pickPoint.z << endl;
 	// Update the picking state of the picked UI Object
 	if (curPick == nullptr)
 	{
@@ -88,13 +94,15 @@ void PickManager::update()
 		curPick->onMouseOver();
 		if (lastPick == nullptr)
 		{
-			if (!InputManager::getInstance()->getMouseButtonDown(MOUSE_LEFT))
+			// From empty place
+			if (!InputManager::getInstance()->getMouseButton(MOUSE_LEFT))
 				curPick->onMouseEnter();
 		}
 		else
 		{
 			if (lastPick == curPick)
 			{
+				// From the same place
 				if (InputManager::getInstance()->getMouseButtonUp(MOUSE_LEFT))
 				{
 					curPick->onMouseClick();
@@ -107,6 +115,7 @@ void PickManager::update()
 			}
 			else
 			{
+				// From different place
 				lastPick->onMouseLeave();
 				curPick->onMouseEnter();
 			}
@@ -149,31 +158,39 @@ void PickManager::ScreenPosToWorldRay(
 }
 
 
-void PickManager::pickTest(Object* object, Ray* ray, Object** out, float* distance)
+void PickManager::pickTest(Object* object, Ray* ray, Object** out, float* distance, vec3* pickPoint)
 {
-	float distance_out;
-	if (TestRayOBBIntersection(ray, object, &distance_out))
+	if (object->pickable && object->receivePick)
 	{
-		if (distance_out < *distance)
+		float distance_out;
+		if (TestRayOBBIntersection(ray, object, &distance_out, pickPoint))
 		{
-			*out = object;
-			*distance = distance_out;
+			//cout << object->name << endl;
+			if (distance_out < *distance)
+			{
+				*out = object;
+				*distance = distance_out;
+			}
 		}
 	}
+
 }
 void PickManager::pickTestForUI(Object* object, int mouseX, int mouseY, Object** out)
 {
-	UITransform* trans = object->getComponent(UITransform);
-	if (trans)
+	if (object->pickable && object->receivePick)
 	{
-		if (mouseX > trans->getLeft() && mouseX < trans->getRight() && mouseY > trans->getBottom() && mouseY < trans->getTop())
+		UITransform* trans = object->getComponent(UITransform);
+		if (trans)
 		{
-			*out = object;
+			if (mouseX > trans->getLeft() && mouseX < trans->getRight() && mouseY > trans->getBottom() && mouseY < trans->getTop())
+			{
+				*out = object;
+			}
 		}
 	}
 }
 
-bool PickManager::TestRayOBBIntersection(Ray* ray, Object* object, float* distance_out)
+bool PickManager::TestRayOBBIntersection(Ray* ray, Object* object, float* distance_out, vec3* pickPoint)
 {
 	float tMin = 0.0f;
 	float tMax = 100000.0f;
@@ -181,7 +198,7 @@ bool PickManager::TestRayOBBIntersection(Ray* ray, Object* object, float* distan
 	vec3 OBBposition_worldspace = object->getTransform()->getGlobalPosition();
 	mat4 modelMatrix = object->getTransform()->getModelMatrix();
 
-	if (object->getComponent(BoxCollider))
+	if (!object->getComponent(BoxCollider))
 		return false;
 	vec3 aabb_min = object->getComponent(BoxCollider)->min;
 	vec3 aabb_max = object->getComponent(BoxCollider)->max;
@@ -273,5 +290,6 @@ bool PickManager::TestRayOBBIntersection(Ray* ray, Object* object, float* distan
 	}
 
 	*distance_out = tMin;
+	*pickPoint = ray->origin + ray->direction * tMin;
 	return true;
 }

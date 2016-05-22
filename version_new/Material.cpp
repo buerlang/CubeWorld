@@ -11,20 +11,33 @@ Material::~Material()
 	RenderManager::getInstance()->unRegisterMaterial(this);
 }
 
-void Material::setBegin(void(*onBegin)())
+Material* Material::create()
 {
-	this->onBegin = onBegin;
-}
-void Material::setExtraBegin(function<void()> onExtraBegin)
-{
-	this->onExtraBegin = onExtraBegin;
-}
-void Material::setEnd(void(*onEnd)())
-{
-	this->onEnd = onEnd;
+	return new Material();
 }
 
-void Material::setTexture(char* imagePath)
+Material* Material::setBegin(function<void()> onBegin)
+{
+	this->onBegin = onBegin;
+	return this;
+}
+Material* Material::setExtraBegin(function<void()> onExtraBegin)
+{
+	this->onExtraBegin = onExtraBegin;
+	return this;
+}
+Material* Material::setEnd(function<void()> onEnd)
+{
+	this->onEnd = onEnd;
+	return this;
+}
+Material* Material::setDraw(function<void(Object*)> onDraw)
+{
+	this->onDraw = onDraw;
+	return this;
+}
+
+Material* Material::setTexture(char* imagePath)
 {
 	// Generate Texture
 	glGenTextures(1, &texture);
@@ -41,15 +54,31 @@ void Material::setTexture(char* imagePath)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	return this;
+}
+Material* Material::setTexture(GLuint texture)
+{
+	this->texture = texture;
+	return this;
 }
 
-void Material::setShader(GLuint shaderID)
+Material* Material::setShader(Shader* shader)
 {
-	this->shader = shaderID;
+	this->shader = shader;
+	return this;
 }
+Material* Material::setHasAlpha(bool hasAlpha)
+{
+	RenderManager::getInstance()->unRegisterMaterial(this);
+	this->hasAlpha = hasAlpha;
+	RenderManager::getInstance()->registerMaterial(this);
+	return this;
+}
+
 void Material::begin()
 {
-	glUseProgram(shader);
+	shader->Use();
+	shader->begin();
 	if(onBegin)
 		onBegin();
 }
@@ -58,45 +87,29 @@ void Material::extraBegin()
 	if (onExtraBegin)
 		onExtraBegin();
 }
+void Material::draw(Object* object)
+{
+	if (onDraw)
+		onDraw(object);
+}
 void Material::render(Object* object)
 {
 	//cout << object->name << endl;
 	Renderer* renderer = object->getComponent(Renderer);
-	UIRenderer* uiRenderer = object->getComponent(UIRenderer);
 	if (renderer)
 	{
-		Transform* transform = object->getComponent(Transform);
-		glUniformMatrix4fv(getUniform("_Model"), 1, GL_FALSE, value_ptr(transform->getModelMatrix()));
+		draw(object);
 		glBindVertexArray(renderer->mesh->VAO);
 		glDrawElements(GL_TRIANGLES, renderer->mesh->indicesCount, GL_UNSIGNED_INT, 0);
 		//std::cout << "Render!" << model[3].x << "," << model[3].y << "," << model[3].z << std::endl;
 		//glBindVertexArray(0);
 	}
-	else if (uiRenderer)
-	{
-		UITransform* uiTransform =object->getComponent(UITransform);
-		vec2 position = uiTransform->getGlobalPosition();	
-		glUniform2f(getUniform("_Position"), position.x, position.y);
-		glBindVertexArray(uiRenderer->mesh->VAO);
-		glDrawElements(GL_TRIANGLES, uiRenderer->mesh->indicesCount, GL_UNSIGNED_INT, 0);
-		//std::cout << "Render!" << position.x << position.y << std::endl;
-		//glBindVertexArray(0);
-	}
+	
 }
 void Material::end()
 {
+	shader->end();
 	if(onEnd)
 		onEnd();
 	glUseProgram(0);
-}
-
-unsigned int Material::getUniform(char* name)
-{
-	if(uniformMap.find(name) != uniformMap.end())
-		return uniformMap.find(name)->second;
-	else return 0;
-}
-void Material::registerUniform(char* name)
-{
-	uniformMap.insert(pair<string, unsigned int>(name, glGetUniformLocation(shader, name)));
 }

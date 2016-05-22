@@ -29,7 +29,10 @@ public:
 	bool localActive = true;
 	//-- Parent object.
 	Object* parent = nullptr;
-	
+
+
+	bool pickable = false;
+	bool receivePick = true;
 	//================================================ public functions ====================================================//
 
 	//-- Get if static or not.

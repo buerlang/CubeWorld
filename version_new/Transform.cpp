@@ -17,9 +17,22 @@ void Transform::onDestroy()
 
 }
 
+vec3 Transform::getLocalPosition()
+{
+	return localPosition;
+}
+vec3 Transform::getLocalRotation()
+{
+	return localRotation;
+}
+vec3 Transform::getLocalScale()
+{
+	return localScale;
+}
+
 vec3 Transform::getGlobalPosition()
 {
-	vec3 out = localPosition;
+	vec3 out = this->getLocalPosition();
 	if (object->parent != nullptr)
 	{
 		out += object->parent->getTransform()->getGlobalPosition();
@@ -28,7 +41,7 @@ vec3 Transform::getGlobalPosition()
 }
 vec3 Transform::getGlobalRotation()
 {
-	vec3 out = localRotation;
+	vec3 out = getLocalRotation();
 	if (object->parent != nullptr)
 	{
 		out += object->parent->getTransform()->getGlobalRotation();
@@ -37,7 +50,7 @@ vec3 Transform::getGlobalRotation()
 }
 vec3 Transform::getGlobalScale()
 {
-	vec3 out = localScale;
+	vec3 out = getLocalScale();
 	if (object->parent != nullptr)
 	{
 		vec3 p = object->parent->getTransform()->getGlobalScale();

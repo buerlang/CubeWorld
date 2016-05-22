@@ -17,10 +17,15 @@ public:
 	virtual void update() override;
 	virtual void onDestroy() override;
 
+	virtual vec3 getLocalPosition();
+	virtual vec3 getLocalRotation();
+	virtual vec3 getLocalScale();
 	vec3 getGlobalPosition();
 	vec3 getGlobalRotation();
 	vec3 getGlobalScale();
-	mat4 getModelMatrix();
+	virtual mat4 getModelMatrix();
+
+
 };
 
 

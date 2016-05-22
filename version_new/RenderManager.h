@@ -6,6 +6,7 @@
 class Material;
 class Object;
 class Mesh;
+class Camera;
 
 typedef std::list<Object*> ObjectList;
 struct ObjectListInfo
@@ -29,11 +30,18 @@ public:
 	void registerObject(Object* object);
 	void unRegisterObject(Object* object);
 	void render();
+	void renderOpaque(Camera* camera);
+	void renderTransparent(Camera* camera);
+	void renderOpaqueWithShader(Camera* camera, Shader* shader);
+	void renderTransparentWithShader(Camera* camera, Shader* shader);
+	void renderWithShader(RenderMap* map, Camera* camera, Shader* shader);
+	void render(RenderMap* map, Camera* camera);
 	void makeBatch();
 protected:
 	RenderManager();
 	static RenderManager* instance;
 	RenderMap renderMap;
+	RenderMap renderMapAlpha;
 };
 
 

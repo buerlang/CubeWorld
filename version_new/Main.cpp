@@ -1,12 +1,13 @@
 #include "IncludeClass.h"
-#include "Shader.h"
+//#include "Shader.h"
 
-const int mapWidth = 50, mapHeight = 50;
+#pragma comment(lib, "glfw3.lib")
+#pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "soil.lib")
+#pragma comment(lib, "assimpd.lib")
 
-Object *obj1, *mainCamera, *obj3;
-Object* objs[mapWidth][mapHeight];
-Material *uiMaterial, *redMaterial, *blueMaterial;
-Mesh *UIQuad, *pyramid;
+Object *obj1, *mainCamera, *obj3, *button1, *gridMap;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void cursor_pos_callback(GLFWwindow* window, double x, double y);
@@ -19,107 +20,30 @@ void registerComponents()
 	TestComponent::regist();
 	UITransform::regist();
 	Renderer::regist();
-	UIRenderer::regist();
 	Camera::regist();
-	Pickable::regist();
-	PickableUI::regist();
 	BoxCollider::regist();
 	CameraControl::regist();
+	UIAnimator::regist();
+	UIImage::regist();
+	GridHolder::regist();
+	UIButton::regist();
+	DirectionalLight::regist();
 }
 
 void setupMeshes()
 {
-	UIQuad = new Mesh();
-	UIQuad->vertices.push_back(Vertex(0, 200, 0, 0, 0, 0, 0, 0));
-	UIQuad->vertices.push_back(Vertex(0, 0, 0, 0, 0, 0, 0, 1));
-	UIQuad->vertices.push_back(Vertex(200, 200, 0, 0, 0, 0, 1, 0));
-	UIQuad->vertices.push_back(Vertex(200, 0, 0, 0, 0, 0, 1, 1));
-	UIQuad->indices.push_back(Index(0, 1, 2));
-	UIQuad->indices.push_back(Index(2, 1, 3));
-	UIQuad->genBuffer();
-
-	pyramid = new Mesh();
-	pyramid->vertices.push_back(Vertex(0.5f, 0.0f, -0.5f));
-	pyramid->vertices.push_back(Vertex(0.2f, 1.0f, -0.5f));
-	pyramid->vertices.push_back(Vertex(0.9f, 1.0f, 0.1f));
-	pyramid->vertices.push_back(Vertex(0.9f, 1.0f, -0.9f));
-	pyramid->indices.push_back(Index(0, 1, 2));
-	pyramid->indices.push_back(Index(0, 2, 3));
-	pyramid->indices.push_back(Index(0, 3, 1));
-	pyramid->indices.push_back(Index(1, 2, 3));
-	pyramid->genBuffer();
+	MeshList::Initialize();
 }
 
 void setupMaterials()
 {
-	uiMaterial = new Material();
-	uiMaterial->setShader(LoadShader("UIVertex.vert", "UIFragment.frag"));
-	uiMaterial->setTexture("container.png");
-	uiMaterial->registerUniform("_Position");
-	uiMaterial->registerUniform("_Sink");
-	uiMaterial->registerUniform("_Scale");
-	uiMaterial->registerUniform("_ScrSize");
-	uiMaterial->registerUniform("_Image");
-	uiMaterial->registerUniform("_UVFactor");
-	uiMaterial->registerUniform("_Emission");
-	uiMaterial->registerUniform("_Opaque");
-	uiMaterial->setBegin([]() {
-		//glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, uiMaterial->texture);
-		glUniform1i(uiMaterial->getUniform("Image"), 0);
-		glUniform3f(uiMaterial->getUniform("_Emission"), 0.0f, 0.0f, 0.0f);
-		glUniform2f(uiMaterial->getUniform("_Sink"), 0.0f, 0.0f);
-		glUniform1f(uiMaterial->getUniform("_UVFactor"), 0.0f);
-		glUniform2f(uiMaterial->getUniform("_Scale"), 1, 1);
-		glUniform1f(uiMaterial->getUniform("_Opaque"), 1);
-	});
-
-	redMaterial = new Material();
-	redMaterial->setShader(LoadShader("SingleColor.vert", "SingleColor.frag"));
-	redMaterial->registerUniform("_Model");
-	redMaterial->registerUniform("_View");
-	redMaterial->registerUniform("_Projection");
-	redMaterial->registerUniform("_Color");
-	redMaterial->setBegin([]() {
-		glUniform4f(redMaterial->getUniform("_Color"), 1, 0, 0, 1);
-	});
-
-	blueMaterial = new Material();
-	blueMaterial->setShader(LoadShader("SingleColor.vert", "SingleColor.frag"));
-	blueMaterial->registerUniform("_Model");
-	blueMaterial->registerUniform("_View");
-	blueMaterial->registerUniform("_Projection");
-	blueMaterial->registerUniform("_Color");
-	blueMaterial->setBegin([]() {
-		glUniform4f(blueMaterial->getUniform("_Color"), 0, 0, 1, 1);
-	});
+	ShaderList::Initialize();
+	MaterialList::Initialize();
 }
 
 void setupObjects()
 {
-	mainCamera = (new Object("Main Camera"))->addComponent(Camera)->addComponent(CameraControl);
-	mainCamera->getTransform()->localPosition = vec3(10, 10, 10);
-	mainCamera->getTransform()->localRotation = vec3(-45, 0, 0);
-
-	obj1 = (new Object("obj1"))->addComponent(UITransform)->addComponent(Renderer);
-	obj1->getComponent(UITransform)->setSize(200, 200);
-	obj1->getComponent(Renderer)->setMesh(UIQuad);
-	obj1->getComponent(Renderer)->setMaterial(uiMaterial);
-
-	for (int i = 0; i < mapWidth; i++)
-	{
-		for (int j = 0; j < mapHeight; j++)
-		{
-			objs[i][j] = (new Object("obj3"))->addComponent(Renderer);
-			objs[i][j]->setIsStatic(true);
-			objs[i][j]->getComponent(Renderer)->setMesh(pyramid);
-			if(i == j)
-				objs[i][j]->getComponent(Renderer)->setMaterial(redMaterial);
-			else
-				objs[i][j]->getComponent(Renderer)->setMaterial(blueMaterial);
-			objs[i][j]->getTransform()->localPosition = vec3(i, 0, j);		
-		}
-	}
+	ObjectsList::Initialize();
 }
 
 
@@ -150,6 +74,7 @@ int main()
 	glViewport(0, 0, Screen::Width, Screen::Height);
 
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -31,13 +31,13 @@ public:
 	vec2 scale;
 
 	//-- Alignment setting.
-	void setAlignment(UIAlignmentEnum align, int offsetX, int offsetY);
+	UITransform* setAlignment(UIAlignmentEnum align, int offsetX, int offsetY);
 	//-- Position setting.
-	void setLocalPosition(int x, int y);
+	UITransform* setOffset(int x, int y);
 	//-- Scale setting.
-	void setScale(float x, float y);
+	UITransform* setScale(float x, float y);
 	//-- Size setting.
-	void setSize(float width, float height);
+	UITransform* setSize(float width, float height);
 
 	virtual void start() override;
 	virtual void update() override;
@@ -49,11 +49,11 @@ public:
 	//-- UI Alignment type in local.
 	UIAlignmentEnum align = UI_BOTTOM_LEFT;
 
+	
 	//-- Return the x position in local screen space.
-	vec2 getLocalPosition();
+	vec3 getLocalPosition() override;
 
-	//-- Return the y position in global screen space.
-	vec2 getGlobalPosition();
+
 	//-- Return the left boundary in global screen space.
 	float getLeft();
 	//-- Return the right boundary in global screen space.
